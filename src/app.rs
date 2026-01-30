@@ -1,5 +1,5 @@
-use egui::{emath, Color32, Frame, Pos2, Rect, Sense, Stroke, StrokeKind, Vec2};
 use egui::emath::RectTransform;
+use egui::{Color32, Frame, Pos2, Rect, Sense, Stroke, StrokeKind, Vec2, emath};
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -67,11 +67,10 @@ impl eframe::App for TemplateApp {
             // The central panel the region left after adding TopPanel's and SidePanel's
             ui.heading("egui-eframe-demo");
 
-
             Frame::canvas(ui.style()).show(ui, |ui| {
                 //self.ui_content(ui);
 
-                let (mut response, painter) =
+                let (response, painter) =
                     ui.allocate_painter(ui.available_size_before_wrap(), Sense::drag());
 
                 let to_screen = emath::RectTransform::from_to(
@@ -91,17 +90,21 @@ impl eframe::App for TemplateApp {
                     .map(|line| {
                         let points: Vec<Pos2> = line.iter().map(|p| to_screen * *p).collect();
                         egui::Shape::line(points, stroke)
-                    }).collect::<Vec<_>>();
+                    })
+                    .collect::<Vec<_>>();
 
                 shapes.push(egui::Shape::rect_stroke(
                     response.rect,
                     20.0,
                     Stroke::new(1.0, Color32::LIGHT_BLUE),
-                    StrokeKind::Inside
+                    StrokeKind::Inside,
                 ));
 
                 shapes.push(egui::Shape::rect_filled(
-                    to_screen.transform_rect(Rect::from_two_pos(Pos2::new(1.1, 0.1), Pos2::new(1.4, 0.4))),
+                    to_screen.transform_rect(Rect::from_two_pos(
+                        Pos2::new(1.1, 0.1),
+                        Pos2::new(1.4, 0.4),
+                    )),
                     20.0,
                     Color32::LIGHT_BLUE,
                 ));
@@ -110,20 +113,20 @@ impl eframe::App for TemplateApp {
                 painter.extend(shapes);
 
                 // Add a single shape
-                painter.add(
-                    egui::Shape::rect_filled(
-                        to_screen.transform_rect(Rect::from_two_pos(Pos2::new(1.2, 0.6), Pos2::new(1.5, 0.9))),
-                        0.0,
-                        Color32::from_rgb(200, 100, 25),
-                    )
-                );
-
+                painter.add(egui::Shape::rect_filled(
+                    to_screen.transform_rect(Rect::from_two_pos(
+                        Pos2::new(1.2, 0.6),
+                        Pos2::new(1.5, 0.9),
+                    )),
+                    0.0,
+                    Color32::from_rgb(200, 100, 25),
+                ));
 
                 // Let's try a grid of squares
                 const ROWS: usize = 16;
                 const COLS: usize = 16;
-                const GRID_MARGIN: f32 = 0.0175;  // Margin around entire grid
-                const CELL_GAP: f32 = 0.01125;  // Gap between cells
+                const GRID_MARGIN: f32 = 0.0175; // Margin around entire grid
+                const CELL_GAP: f32 = 0.01125; // Gap between cells
 
                 const GRID_ORIGIN: Pos2 = Pos2::new(0.1, 0.1);
                 const GRID_DIMS: Vec2 = Vec2::new(0.8, 0.8);
